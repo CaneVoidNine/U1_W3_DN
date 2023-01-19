@@ -1,6 +1,6 @@
 import express from "express";
 import BlogPostModel from "./model.js";
-import CommentModel from '../comments/model.js'
+import CommentModel from "../comments/model.js";
 import { extname } from "path";
 import createHttpError from "http-errors";
 const blogPostsRouter = express.Router();
@@ -20,19 +20,21 @@ blogPostsRouter.post("/", async (req, res, next) => {
 // GET
 
 blogPostsRouter.get("/", async (req, res, next) => {
-    try {
-      const blogPosts= await BlogPostModel.find()
-      res.send(blogPosts)
-    } catch (error) {
-      next(error)
-    }
-  })
+  try {
+    const blogPosts = await BlogPostModel.find().populate("authors");
+    res.send(blogPosts);
+  } catch (error) {
+    next(error);
+  }
+});
 
 // GET SPECIFIC
 
 blogPostsRouter.get("/:blogPostId", async (req, res, next) => {
   try {
-    const blogPost = await BlogPostModel.findById(req.params.blogPostId);
+    const blogPost = await BlogPostModel.findById(
+      req.params.blogPostId
+    ).populate({ path: "authors", select: "firstName lastName" });
     if (blogPost) {
       res.send(blogPost);
     } else {
